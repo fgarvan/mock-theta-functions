@@ -1,0 +1,55 @@
+## memory used=9039.1MB, alloc=130.0MB, time=71.73
+  T:=100000:
+  comp_phi05:=proc(T)
+    local phi05A,aA,k,n,n1,j,k1,phi05AMAT,phi05Aq;
+    ########################################################################
+    # INITIALIZE Arrays phi05A and aA
+     phi05A:=Array(0..T):
+     aA:=Array(0..T):
+     for k from 0 to T do aA[k]:=0: phi05A[k]:=0: od:
+     phi05A[0]:=1: 
+     phi05A[0];
+    ########################################################################
+    # We compute the coefficients a(n):
+     for n from 0 to trunc( (sqrt(1+8*T)-1)/4) do
+        n1:=n*(5*n+2): 
+        for j from -n to n  do
+           k:=n1-3*j^2-j: if k<= T then
+           aA[k]:= aA[k]+ (-1)^(j): fi:
+         od:
+     od:
+     for n from 0 to trunc( (sqrt(25+8*T)-7)/4) do
+        n1:=n*(5*n+2)+6*n+3:
+        for j from -n to n do 
+           k:=n1-3*j^2-j: if k<=T then
+           aA[k]:= aA[k]+ (-1)^(j+1): fi:
+         od:
+     od:
+    ########################################################################
+    # Compute coeffs of phi05 and store them in Array phi05A
+     for n from 1 to T do
+       k1:=trunc ((-1 + sqrt(1+8*n))/2):
+       for k from 1 to k1 do
+         ##nk2:=n-2*k*(3*k-1): if nk2>2000 or nk2<1 then print("n=",n,"k=",k);fi:
+         phi05A[n]:=phi05A[n] - (-1)^(k*(k+1)/2)*phi05A[n-k*(k+1)/2]:
+       od:
+       phi05A[n]:=phi05A[n]+aA[n]:
+     od:
+    ########################################################################
+    # SAVING COEFFICIENTS IN DIFFERENT FORMATS
+#  (1) Saving coefficients as a matrix in a txt file using ExportMatrix.
+    phi05AMAT:=Matrix(T,2):
+    for j from 1 to T do
+       phi05AMAT[j,1]:=j:
+       phi05AMAT[j,2]:=phi05A[j]:
+    od:
+    ExportMatrix("phi05AMAT.txt",phi05AMAT);
+# (2) Saving the Array fA in a dot-m file:
+    save phi05A,"phi05A.m":
+# (3) Saving the phi05 as the q-series phi05Aq in a dot-m-file
+    phi05Aq:=add(phi05A[n]*q^n,n=0..T):
+    save phi05Aq, "phi05func.m":
+    RETURN():
+    end:
+  comp_phi05(T):
+quit

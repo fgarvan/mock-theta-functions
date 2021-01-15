@@ -1,0 +1,61 @@
+  T:=100000:
+  comp_psi3:=proc(T)
+    local psi3A,aA,k,n,n1,m,k1,k2,psi3Aq,psi3AMAT,j;
+    psi3A:=Array(1..T):
+    aA:=Array(1..T):
+    ########################################################################
+    # INITIALIZE Arrays psi3A and aA
+    for k from 1 to T do aA[k]:=0: psi3A[k]:=0: od:
+    psi3A[1]:=1: 
+    ########################################################################
+#   We compute the coefficients a(n) and store them in the Array Aa
+    for n from 0 to trunc( (sqrt(3+6*T)-3)/6) do
+      n1:=6*n*(n+1)+1:
+      for m from 0 to trunc( (T-n1)/(4*n+1) ) do
+        k:=n1+m*(4*n+1):
+        aA[k]:= aA[k]+ (-1)^(n):
+      od:
+    od:
+    for n from 0 to trunc( (sqrt(1+6*T)-5)/6) do
+      n1:=n*(6*n+10)+4:
+      for m from 0 to trunc( (T-n1)/(4*n+3) ) do
+        k:=n1+m*(4*n+3):
+        aA[k]:= aA[k]+ (-1)^(n):
+      od:
+    od:
+    ########################################################################
+    # Compute coeffs of psi3 and store them in Array psi3A
+    for n from 2 to T do
+      k1:=trunc ((1 + sqrt(-5+6*n))/6):
+      k2:= trunc( (-1 +sqrt(-5+6*n))/6):
+      for k from 1 to k1 do
+        ##nk2:=n-2*k*(3*k-1): if nk2>2000 or nk2<1 then print("n=",n,"k=",k);fi:
+        psi3A[n]:=psi3A[n] - (-1)^k*psi3A[n-2*k*(3*k-1)]:
+      od:
+      for k from 1 to k2 do
+        psi3A[n]:=psi3A[n] - (-1)^k*psi3A[n-2*k*(3*k+1)]:
+      od:
+      psi3A[n]:=psi3A[n]+aA[n]:
+    od:
+    ########################################################################
+    psi3Aq:=add(psi3A[n]*q^n,n=1..T):
+    # SAVING COEFFICIENTS IN DIFFERENT FORMATS
+    psi3Aq:=add(psi3A[n]*q^n,n=1..T):
+#   (1) Saving coefficients as a matrix in a txt file using ExportMatrix.
+    psi3AMAT:=Matrix(T,2):
+    for j from 1 to T do
+       psi3AMAT[j,1]:=j:
+       psi3AMAT[j,2]:=psi3A[j]:
+    od:
+    ExportMatrix("psi3AMAT.txt",psi3AMAT);
+# (2) Saving the Array fA in a dot-m file:
+    save psi3A,"psi3A.m":
+# (3) Saving the psi3 as the q-series psi3Aq in a dot-m-file
+    psi3Aq:=add(psi3A[n]*q^n,n=1..T):
+    save psi3Aq, "psi3func.m":
+    RETURN():
+    end:
+   
+    comp_psi3(T):
+
+quit

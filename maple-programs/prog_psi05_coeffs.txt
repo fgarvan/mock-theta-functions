@@ -1,0 +1,56 @@
+  T:=100000:
+  comp_psi05:=proc(T)
+    local psi05A,aA,k,n,n1,j,k1,psi05AMAT,psi05Aq;
+    ########################################################################
+    # INITIALIZE Arrays psi05A and aA
+     psi05A:=Array(0..T):
+     aA:=Array(1..T):
+     for k from 1 to T do aA[k]:=0: psi05A[k]:=0: od:
+     psi05A[1]:=1: psi05A[0]:=0: 
+    ########################################################################
+# We compute the coefficients a(n):
+     for n from 1 to trunc( (sqrt(1+4*T)+1)/2) do
+        n1:=n*(5*n-1)/2: 
+        for j from -n to n-1  do
+           k:=n1-j*(3*j+1)/2: if k<= T then
+           aA[k]:= aA[k]+ (-1)^(j+1): fi:
+         od:
+     od:
+     for n from 1 to trunc( sqrt(T)) do
+        n1:=n*(5*n-1)/2+n:
+        for j from -n to n-1 do 
+           k:=n1-j*(3*j+1)/2: if k<=T then
+           aA[k]:= aA[k]+ (-1)^(j): fi:
+         od:
+     od:
+    ########################################################################
+    # Compute coeffs of psi05 and store them in Array psi05A
+     for n from 2 to T do
+       k1:=trunc (sqrt(n)):
+       for k from 1 to k1 do
+         ##nk2:=n-2*k*(3*k-1): if nk2>2000 or nk2<1 then print("n=",n,"k=",k);fi:
+         psi05A[n]:=psi05A[n] - 2*(-1)^(k)*psi05A[n-k^2]:
+       od:
+     #for k from 1 to k2 do
+      #   phi15A[n]:=f15A[n] - (-1)^k*phi15A[n-k*(3*k+1)/2]:
+       #od:
+       psi05A[n]:=psi05A[n]+aA[n]:
+     od:
+    ########################################################################
+    # SAVING COEFFICIENTS IN DIFFERENT FORMATS
+#   (1) Saving coefficients as a matrix in a txt file using ExportMatrix.
+    psi05AMAT:=Matrix(T,2):
+    for j from 1 to T do
+       psi05AMAT[j,1]:=j:
+       psi05AMAT[j,2]:=psi05A[j]:
+    od:
+    ExportMatrix("psi05AMAT.txt",psi05AMAT);
+# (2) Saving the Array fA in a dot-m file:
+    save psi05A,"psi05A.m":
+# (3) Saving the psi05 as the q-series psi05Aq in a dot-m-file
+    psi05Aq:=add(psi05A[n]*q^n,n=1..T):
+    save psi05Aq, "psi05func.m":
+    RETURN():
+    end:
+  comp_psi05(T):
+quit

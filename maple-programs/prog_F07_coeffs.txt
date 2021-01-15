@@ -1,0 +1,77 @@
+## memory used=14497.0MB, alloc=246.6MB, time=103.75
+  T:=100000:
+  comp_F07:=proc(T)
+    local F07A,aA,k,n,n1,j,k1,k2,F07Aq,F07AMAT;
+    ########################################################################
+    # INITIALIZE Arrays F07A and aA
+     F07A:=Array(0..T):
+     aA:=Array(0..T):
+     for k from 0 to T do aA[k]:=0: F07A[k]:=0: od:
+     F07A[0]:=1: 
+    ########################################################################
+    # We compute the coefficients a(n):
+     for n from 0 to trunc( (sqrt(1+24*T)-1)/12) do
+        n1:=7*n^2+n: 
+        for j from -n to n  do
+           k:=n1-j^2: if k<= T then
+           aA[k]:= aA[k]+ 1: fi:
+         od:
+     od:
+     
+     for n from 0 to trunc( (sqrt(25+24*T)-13)/12) do
+        n1:=7*n^2+13*n+6:
+        for j from -n to n do 
+           k:=n1-j^2: if k<=T then
+           aA[k]:= aA[k]- 1: fi:
+         od:
+     od:
+     
+     for n from 0 to trunc( (sqrt(1+24*T)-7)/12) do
+        n1:=7*n^2+8*n+2: 
+        for j from 0 to n  do
+           k:=n1-j^2-j: if k<= T then
+           aA[k]:= aA[k]-2: fi:
+         od:
+     od:
+     
+     for n from 0 to trunc( (sqrt(25+24*T)-19)/12) do
+        n1:=7*n^2+20*n+14:
+        for j from 0 to n do 
+           k:=n1-j^2-j: if k<=T then
+           aA[k]:= aA[k]+2: fi:
+         od:
+     od:
+     
+    ########################################################################
+    # Compute coeffs of F07 and store them in Array F07A
+     for n from 1 to T do
+       k1:=trunc((sqrt(1+24*n)+1)/6):
+       k2:=trunc((sqrt(1+24*n)-1)/6):
+       
+       for k from 1 to k1 do
+         ##nk2:=n-2*k*(3*k-1): if nk2>2000 or nk2<1 then print("n=",n,"k=",k);fi:
+         F07A[n]:=F07A[n] - (-1)^(k)*F07A[n-k*(3*k-1)/2]:
+       od:
+     for k from 1 to k2 do
+        F07A[n]:=F07A[n] - (-1)^k*F07A[n-k*(3*k+1)/2]:
+       od:
+       F07A[n]:=F07A[n]+aA[n]:
+     od:
+    ########################################################################
+    # SAVING COEFFICIENTS IN DIFFERENT FORMATS
+#   (1) Saving coefficients as a matrix in a txt file using ExportMatrix.
+    F07AMAT:=Matrix(T,2):
+    for j from 1 to T do
+       F07AMAT[j,1]:=j:
+       F07AMAT[j,2]:=F07A[j]:
+    od:
+    ExportMatrix("F07AMAT.txt",F07AMAT);
+# (2) Saving the Array fA in a dot-m file:
+    save F07A,"F07A.m":
+# (3) Saving the F07 as the q-series F07Aq in a dot-m-file
+    F07Aq:=add(F07A[n]*q^n,n=0..T):
+    save F07Aq, "F07func.m":
+    RETURN():
+    end:
+  comp_F07(T):
+quit

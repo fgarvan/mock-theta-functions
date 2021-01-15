@@ -1,0 +1,58 @@
+  T:=100000:
+  comp_F05:=proc(T)
+    local F05A,aA,k,n,n1,j,k1,k2,F05AMAT,F05Aq;
+    ########################################################################
+    # INITIALIZE Arrays F05A and aA
+     F05A:=Array(0..T):
+     aA:=Array(0..T):
+     for k from 1 to T do aA[k]:=0: F05A[k]:=0: od:
+     F05A[0]:=1: 
+    ########################################################################
+    # We compute the coefficients a(n):
+     for n from 0 to trunc( (sqrt(1+12*T)-1)/6) do
+        n1:=5*n^2+2*n: 
+        for j from 0 to 2*n  do
+           k:=n1-j*(j+1)/2: if k<= T then
+           aA[k]:= aA[k]+ (-1)^(n): fi:
+         od:
+     od:
+     for n from 0 to trunc( (sqrt(13+12*T)-7)/6) do
+        n1:=5*n^2+2*n+6*n+3:
+        for j from 0 to 2*n do 
+           k:=n1-j*(j+1)/2: if k<=T then
+           aA[k]:= aA[k]+ (-1)^(n): fi:
+         od:
+     od:
+    ########################################################################
+    # Compute coeffs of F05 and store them in Array F05A
+     for n from 1 to T do
+       k1:=trunc((sqrt(1+12*n)+1)/6):
+       k2:=trunc((sqrt(1+12*n)-1)/6):
+       
+       for k from 1 to k1 do
+         ##nk2:=n-2*k*(3*k-1): if nk2>2000 or nk2<1 then print("n=",n,"k=",k);fi:
+         F05A[n]:=F05A[n] - (-1)^(k)*F05A[n-k*(3*k-1)]:
+       od:
+     for k from 1 to k2 do
+        F05A[n]:=F05A[n] - (-1)^k*F05A[n-k*(3*k+1)]:
+       od:
+       F05A[n]:=F05A[n]+aA[n]:
+     od:
+    ########################################################################
+    # SAVING COEFFICIENTS IN DIFFERENT FORMATS
+#   (1) Saving coefficients as a matrix in a txt file using ExportMatrix.
+    F05AMAT:=Matrix(T,2):
+    for j from 1 to T do
+       F05AMAT[j,1]:=j:
+       F05AMAT[j,2]:=F05A[j]:
+    od:
+    ExportMatrix("FF05AMAT.txt",F05AMAT);
+# (2) Saving the Array fA in a dot-m file:
+    save F05A,"FF05A.m":
+# (3) Saving the F05 as the q-series F05Aq in a dot-m-file
+    F05Aq:=add(F05A[n]*q^n,n=0..T):
+    save F05Aq, "FF05func.m":
+    RETURN():
+    end:
+  comp_F05(T):
+quit

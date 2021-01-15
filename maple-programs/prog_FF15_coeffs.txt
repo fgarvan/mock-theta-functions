@@ -1,0 +1,59 @@
+## memory used=12948.0MB, alloc=211.7MB, time=88.03
+  T:=100000:
+  comp_F15:=proc(T)
+    local F15A,aA,k,n,n1,j,k1,k2,F15AMAT,F15Aq;
+    ########################################################################
+    # INITIALIZE Arrays F15A and aA
+     F15A:=Array(0..T):
+     aA:=Array(0..T):
+     for k from 1 to T do aA[k]:=0: F15A[k]:=0: od:
+     F15A[0]:=1: 
+    ########################################################################
+    # We compute the coefficients a(n):
+     for n from 0 to trunc( (sqrt(9+12*T)-3)/6) do
+        n1:=5*n^2+4*n: 
+        for j from 0 to 2*n  do
+           k:=n1-j*(j+1)/2: if k<= T then
+           aA[k]:= aA[k]+ (-1)^(n): fi:
+         od:
+     od:
+     for n from 0 to trunc( (sqrt(13+12*T)-5)/6) do
+        n1:=5*n^2+4*n+2*n+1:
+        for j from 0 to 2*n do 
+           k:=n1-j*(j+1)/2: if k<=T then
+           aA[k]:= aA[k]+ (-1)^(n): fi:
+         od:
+     od:
+    ########################################################################
+    # Compute coeffs of F15 and store them in Array F15A
+     for n from 1 to T do
+       k1:=trunc((sqrt(1+12*n)+1)/6):
+       k2:=trunc((sqrt(1+12*n)-1)/6):
+       
+       for k from 1 to k1 do
+         ##nk2:=n-2*k*(3*k-1): if nk2>2000 or nk2<1 then print("n=",n,"k=",k);fi:
+         F15A[n]:=F15A[n] - (-1)^(k)*F15A[n-k*(3*k-1)]:
+       od:
+     for k from 1 to k2 do
+        F15A[n]:=F15A[n] - (-1)^k*F15A[n-k*(3*k+1)]:
+       od:
+       F15A[n]:=F15A[n]+aA[n]:
+     od:
+    ########################################################################
+    # SAVING COEFFICIENTS IN DIFFERENT FORMATS
+#   (1) Saving coefficients as a matrix in a txt file using ExportMatrix.
+    F15AMAT:=Matrix(T,2):
+    for j from 1 to T do
+       F15AMAT[j,1]:=j:
+       F15AMAT[j,2]:=F15A[j]:
+    od:
+    ExportMatrix("FF15AMAT.txt",F15AMAT);
+# (2) Saving the Array fA in a dot-m file:
+    save F15A,"FF15A.m":
+# (3) Saving the F15 as the q-series F15Aq in a dot-m-file
+    F15Aq:=add(F15A[n]*q^n,n=0..T):
+    save F15Aq, "FF15func.m":
+    RETURN():
+    end:
+  comp_F15(T):
+quit

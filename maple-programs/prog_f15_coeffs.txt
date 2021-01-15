@@ -1,0 +1,57 @@
+## memory used=13914.2MB, alloc=214.6MB, time=103.83
+  T:=100000:
+  comp_f15:=proc(T)
+    ########################################################################
+    # INITIALIZE Arrays f15A and aA
+     f15A:=Array(0..T):
+     aA:=Array(0..T):
+     for k from 0 to T do aA[k]:=0: f15A[k]:=0: od:
+     f15A[0]:=1: 
+    ########################################################################
+# We compute the coefficients a(n):
+     for n from 0 to trunc( (sqrt(9+24*T)-3)/6) do
+        n1:=n*(5*n+3)/2: 
+        for j from -n to n  do
+           k:=n1-j^2: if k<= T then
+           aA[k]:= aA[k]+ (-1)^(j): fi:
+         od:
+     od:
+     for n from 0 to trunc( (sqrt(25+24*T)-7)/6) do
+        n1:=n*(5*n+3)/2+2*n+1:
+        for j from -n to n do 
+           k:=n1-j^2: if k<=T then
+           aA[k]:= aA[k]+ (-1)^(j+1): fi:
+         od:
+     od:
+    ########################################################################
+    # Compute coeffs of f15  and store the Array f15A
+     for n from 1 to T do
+       k1:=trunc ((1 + sqrt(1+24*n))/6):
+       k2:= trunc( (-1 +sqrt(1+24*n))/6):
+       for k from 1 to k1 do
+         ##nk2:=n-2*k*(3*k-1): if nk2>2000 or nk2<1 then print("n=",n,"k=",k);fi:
+         f15A[n]:=f15A[n] - (-1)^k*f15A[n-k*(3*k-1)/2]:
+       od:
+     for k from 1 to k2 do
+         f15A[n]:=f15A[n] - (-1)^k*f15A[n-k*(3*k+1)/2]:
+       od:
+       f15A[n]:=f15A[n]+aA[n]:
+     od:
+    ########################################################################
+    # SAVING COEFFICIENTS IN DIFFERENT FORMATS
+#   (1) Saving coefficients as a matrix in a txt file using ExportMatrix.
+    f15AMAT:=Matrix(T,2):
+    for j from 1 to T do
+       f15AMAT[j,1]:=j:
+       f15AMAT[j,2]:=f15A[j]:
+    od:
+    ExportMatrix("f15AMAT.txt",f15AMAT);
+# (2) Saving the Array fA in a dot-m file:
+    save f15A,"f15A.m":
+# (3) Saving the f15 as the q-series f15Aq in a dot-m-file
+    f15Aq:=add(f15A[n]*q^n,n=0..T):
+    save f15Aq, "f15func.m":
+    RETURN():
+    end:
+comp_f15(T);
+quit

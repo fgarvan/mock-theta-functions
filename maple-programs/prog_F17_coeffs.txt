@@ -1,0 +1,73 @@
+## memory used=14506.8MB, alloc=246.6MB, time=146.31
+  T:=100000:
+  comp_F17:=proc(T)
+    local F17A,aA,k,n,n1,j,k1,k2,F17AMAT,F17Aq;
+    ########################################################################
+    # INITIALIZE Arrays F17A and aA
+      F17A:=Array(0..T):
+      aA:=Array(0..T):
+      for k from 0 to T do aA[k]:=0: F17A[k]:=0: od:
+      F17A[0]:=0: F17A[1]:=1: 
+    ########################################################################
+# We compute the coefficients a(n):
+      for n from 0 to trunc( (sqrt(1+24*T)-5)/12) do
+         n1:=7*n^2+5*n+1: 
+         for j from -n to n  do
+            k:=n1-j^2: if k<= T then
+            aA[k]:= aA[k]+ 1: fi:
+          od:
+      od:
+      for n from 0 to trunc( (sqrt(9+24*T)-9)/12) do
+         n1:=7*n^2+9*n+3:
+         for j from -n to n do 
+            k:=n1-j^2: if k<=T then
+            aA[k]:= aA[k]- 1: fi:
+          od:
+      od:
+      for n from 0 to trunc( (sqrt(1+24*T)-11)/12) do
+         n1:=7*n^2+12*n+5: 
+         for j from 0 to n  do
+            k:=n1-j^2-j: if k<= T then
+            aA[k]:= aA[k]-2: fi:
+          od:
+      od:
+      for n from 0 to trunc( (sqrt(9+24*T)-15)/12) do
+         n1:=7*n^2+16*n+9:
+         for j from 0 to n do 
+            k:=n1-j^2-j: if k<=T then
+            aA[k]:= aA[k]+2: fi:
+          od:
+      od:
+    ########################################################################
+    # Compute coeffs of F17 and store them in Array F17A
+      for n from 2 to T do
+        k1:=trunc((sqrt(1+24*n)+1)/6):
+        k2:=trunc((sqrt(1+24*n)-1)/6):
+        
+        for k from 1 to k1 do
+          ##nk2:=n-2*k*(3*k-1): if nk2>2000 or nk2<1 then print("n=",n,"k=",k);fi:
+          F17A[n]:=F17A[n] - (-1)^(k)*F17A[n-k*(3*k-1)/2]:
+        od:
+      for k from 1 to k2 do
+         F17A[n]:=F17A[n] - (-1)^k*F17A[n-k*(3*k+1)/2]:
+        od:
+        F17A[n]:=F17A[n]+aA[n]:
+      od:
+    ########################################################################
+    # SAVING COEFFICIENTS IN DIFFERENT FORMATS
+#   (1) Saving coefficients as a matrix in a txt file using ExportMatrix.
+    F17AMAT:=Matrix(T,2):
+    for j from 1 to T do
+       F17AMAT[j,1]:=j:
+       F17AMAT[j,2]:=F17A[j]:
+    od:
+    ExportMatrix("F17AMAT.txt",F17AMAT);
+# (2) Saving the Array fA in a dot-m file:
+    save F17A,"F17A.m":
+# (3) Saving the F17 as the q-series F17Aq in a dot-m-file
+    F17Aq:=add(F17A[n]*q^n,n=1..T):
+    save F17Aq, "F17func.m":
+    RETURN():
+    end:
+  comp_F17(T):
+quit

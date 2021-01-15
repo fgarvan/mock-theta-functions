@@ -1,0 +1,60 @@
+## 300K: memory used=78154.5MB, alloc=1722.4MB, time=489.38
+## 500K: memory used=166566.6MB, alloc=3338.0MB, time=888.01
+  T:=1000000:
+  comp_omega3:=proc(T)
+    local omega3A,aA,k,n,n1,m,k1,k2,omega3Aq,omega3AMAT,j;
+    omega3A:=Array(0..T):
+    aA:=Array(0..T):
+    ########################################################################
+    # INITIALIZE Arrays omega3A and aA
+    for k from 0 to T do aA[k]:=0: omega3A[k]:=0: od:
+    omega3A[0]:=1: aA[0]:=0:
+    ########################################################################
+#   We compute the coefficients a(n) and store them in the Array Aa
+     for n from 0 to trunc( (sqrt(9+12*T)-3)/6) do
+        n1:=3*n*(n+1):
+        for m from 0 to trunc( (T-n1)/(2*n+1) ) do
+           k:=n1+(2*n+1)*m:
+           aA[k]:= aA[k]+ (-1)^(n):
+         od:
+     od:
+     for n from 0 to trunc( (sqrt(13+12*T)-5)/6) do
+        n1:=3*n*(n+1)+2*n+1:
+        for m from 0 to trunc( (T-n1)/(2*n+1) ) do
+           k:=n1+(2*n+1)*m:
+           aA[k]:= aA[k]+ (-1)^(n):
+         od:
+     od:
+    ########################################################################
+    # Compute coeffs of omega3 and store them in Array omega3A
+    for n from 1 to T do
+      k1:=trunc ((1 + sqrt(1+12*n))/6):
+      k2:= trunc( (-1 +sqrt(1+12*n))/6):
+      for k from 1 to k1 do
+        omega3A[n]:=omega3A[n] - (-1)^k*omega3A[n-k*(3*k-1)]:
+      od:
+      for k from 1 to k2 do
+        omega3A[n]:=omega3A[n] - (-1)^k*omega3A[n-k*(3*k+1)]:
+      od:
+      omega3A[n]:=omega3A[n]+aA[n]:
+    od:
+    ########################################################################
+    # SAVING COEFFICIENTS IN DIFFERENT FORMATS
+#   (1) Saving coefficients as a matrix in a txt file using ExportMatrix.
+    omega3AMAT:=Matrix(T,2):
+    for j from 1 to T do
+       omega3AMAT[j,1]:=j-1:
+       omega3AMAT[j,2]:=omega3A[j-1]:
+    od:
+    ExportMatrix("omega3AMAT.txt",omega3AMAT);
+# (2) Saving the Array fA in a dot-m file:
+    save omega3A,"omega3A.m":
+# (3) Saving the omega3 as the q-series omega3Aq in a dot-m-file
+    omega3Aq:=add(omega3A[n]*q^n,n=0..T):
+    save omega3Aq, "omega3func.m":
+    RETURN():
+    end:
+   
+    comp_omega3(T):
+
+quit

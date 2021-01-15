@@ -1,0 +1,55 @@
+## memory used=9030.4MB, alloc=134.6MB, time=71.66
+  T:=100000:
+  comp_phi15:=proc(T)
+    local phi15A,aA,k,n,n1,j,k1,phi15Aq,phi15AMAT;
+    ########################################################################
+    # INITIALIZE Arrays phi15A and aA
+     phi15A:=Array(0..T):
+     aA:=Array(1..T):
+# INITIALIZE:
+     for k from 1 to T do aA[k]:=0: phi15A[k]:=0: od:
+     phi15A[1]:=1: phi15A[0]:=0: 
+    ########################################################################
+# We compute the coefficients a(n):
+     for n from 0 to trunc( (sqrt(1+8*T)-3)/4) do
+        n1:=n*(5*n+4): 
+        for j from -n to n  do
+           k:=n1-3*j^2-j+1: if k<= T then
+           aA[k]:= aA[k]+ (-1)^(j): fi:
+         od:
+     od:
+     for n from 0 to trunc( (sqrt(-7+8*T)-3)/4) do
+        n1:=n*(5*n+4)+2*n+1:
+        for j from -n to n do 
+           k:=n1-3*j^2-j+1: if k<=T then
+           aA[k]:= aA[k]+ (-1)^(j+1): fi:
+         od:
+     od:
+    ########################################################################
+    # Compute coeffs of phi15 and store them in Array phi15A
+     for n from 2 to T do
+       k1:=trunc ((-1 + sqrt(1+8*n))/2):
+       for k from 1 to k1 do
+         ##nk2:=n-2*k*(3*k-1): if nk2>2000 or nk2<1 then print("n=",n,"k=",k);fi:
+         phi15A[n]:=phi15A[n] - (-1)^(k*(k+1)/2)*phi15A[n-k*(k+1)/2]:
+       od:
+       phi15A[n]:=phi15A[n]+aA[n]:
+     od:
+    ########################################################################
+    # SAVING COEFFICIENTS IN DIFFERENT FORMATS
+#   (1) Saving coefficients as a matrix in a txt file using ExportMatrix.
+    phi15AMAT:=Matrix(T,2):
+    for j from 1 to T do
+       phi15AMAT[j,1]:=j:
+       phi15AMAT[j,2]:=phi15A[j]:
+    od:
+    ExportMatrix("phi15AMAT.txt",phi15AMAT);
+# (2) Saving the Array fA in a dot-m file:
+    save phi15A,"phi15A.m":
+# (3) Saving the phi15 as the q-series phi15Aq in a dot-m-file
+    phi15Aq:=add(phi15A[n]*q^n,n=1..T):
+    save phi15Aq, "phi15func.m":
+    RETURN():
+    end:
+  comp_phi15(T):
+quit

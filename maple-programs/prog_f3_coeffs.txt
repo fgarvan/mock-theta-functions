@@ -1,0 +1,54 @@
+  print("--------------------------------------------------------------------");
+  T:=100000;
+  print("--------------------------------------------------------------------");
+  comp_f3:=proc(T)
+    local f3A,aA,k,n,n1,m,k1,k2,f3Aq,f3AMAT,j;
+    f3A:=Array(0..T):
+    aA:=Array(0..T):
+    ########################################################################
+    # INITIALIZE Arrays f3A and aA
+    for k from 0 to T do aA[k]:=0: f3A[k]:=0: od:
+    f3A[0]:=1: aA[0]:=1: 
+    ########################################################################
+#   We compute the coefficients a(n) and store them in the Array Aa
+      for n from 1 to trunc( (sqrt(1+24*T)-1)/6) do
+         n1:=n*(3*n+1)/2:
+         for m from 0 to trunc( (T-n1)/n ) do
+            k:=n1+n*m:
+            aA[k]:= aA[k]+ 4*(-1)^(m+n):
+          od:
+      od:
+    ########################################################################
+    # Compute coeffs of f3 and store them in Array f3A
+      for n from 1 to T do
+      if modp(n,1000)=0 then print(n); fi:
+        k1:=trunc ((1 + sqrt(1+24*n))/6):
+        k2:= trunc( (-1 +sqrt(1+24*n))/6):
+        for k from 1 to k1 do
+          f3A[n]:=f3A[n] - (-1)^k*f3A[n-k*(3*k-1)/2]:
+        od:
+      for k from 1 to k2 do
+          f3A[n]:=f3A[n] - (-1)^k*f3A[n-k*(3*k+1)/2]:
+        od:
+        f3A[n]:=f3A[n]+aA[n]:
+      od:
+    ########################################################################
+    # SAVING COEFFICIENTS IN DIFFERENT FORMATS
+#   (1) Saving coefficients as a matrix in a txt file using ExportMatrix.
+      f3AMAT:=Matrix(T+1,2):
+      for j from 1 to T do
+         f3AMAT[j,1]:=j-1:
+         f3AMAT[j,2]:=f3A[j-1]:
+      od:
+      ExportMatrix("f3AMAT.txt",f3AMAT);
+#   (2) Saving the Array f3A in a dot-m file:
+      save f3A,"f3A.m":
+#   (3) Saving the series f3Aq in a dot-m file:
+    f3Aq:=add(f3A[n]*q^n,n=0..T):
+      save f3Aq, "f3funcs.m":
+    RETURN():
+    end:
+   
+    comp_f3(T):
+
+quit
